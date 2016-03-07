@@ -1,0 +1,30 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/wellington/go-libsass",
+			"repository": "https://github.com/wellington/go-libsass",
+			"revision": "e4e2caac0b909f543121a9d2bfecdc55d88a7d08",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/wellington/spritewell",
+			"repository": "https://github.com/wellington/spritewell",
+			"revision": "4b95dacd03cd9468526a121d6b637b0bad028331",
+			"branch": "master"
+		},
+		{
+			"importpath": "golang.org/x/net/context",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "e7da8edaa52631091740908acaf2c2d4c9b3ce90",
+			"branch": "master",
+			"path": "/context"
+		},
+		{
+			"importpath": "gopkg.in/olebedev/go-duktape.v2",
+			"repository": "https://gopkg.in/olebedev/go-duktape.v2",
+			"revision": "55fa18c4e63070a925cf2090e699d4e6edd80949",
+			"branch": "v2"
+		}
+	]
+}
