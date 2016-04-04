@@ -82,13 +82,33 @@ func resolvePath(ei *types.ExtensionInfo, assetPath string, baseDir string) (str
 	return assetPath, ext, nil
 }
 
+func (s *Sprocket) checkPublicPath(assetPath string, baseDir string) (string, error) {
+	if len(s.publicPath) == 0 {
+		return "", nil
+	}
+	fullPath := filepath.Join(s.publicPath, baseDir, assetPath)
+	file, err := os.Open(filepath.Join(s.publicPath, baseDir, assetPath))
+	//TODO check the different errors and return the error only if the file exist but something went wrong
+	if err != nil {
+		return "", err
+	}
+	file.Close()
+	return fullPath, nil
+}
+
 // resolvePath
 // Return Pathfound, Extension found, or an error
 // It will search base on path then extension
-func (s *Sprocket) resolvePath(assetPath string, baseDir string) (string, *types.ExtensionInfo, error) {
+func (s *Sprocket) resolvePath(assetPath string, baseDir string, forceRebuild bool) (string, *types.ExtensionInfo, error) {
 	var err error
 	ext := filepath.Ext(assetPath)
 	extInfo := s.getExtensionInfoOrDefault(ext)
+	if forceRebuild == false {
+		assetPublicPath, _ := s.checkPublicPath(assetPath, baseDir)
+		if len(assetPublicPath) > 0 {
+			return assetPublicPath, extInfo, nil
+		}
+	}
 	assetPath, ext, err = resolvePath(extInfo, assetPath, baseDir)
 	if err != nil {
 		return "", nil, err

@@ -11,7 +11,7 @@ import (
 	"github.com/znly/go-sprockets/types"
 )
 
-func (s *Sprocket) readAsset(assetPath string, extInfo *types.ExtensionInfo) (fullContent, content []byte, requires []types.RequireInterface, err error) {
+func (s *Sprocket) readAsset(assetPath string, extInfo *types.ExtensionInfo, forceRebuild bool) (fullContent, content []byte, requires []types.RequireInterface, err error) {
 	if extInfo.RequirePattern == nil {
 		content, err = s.readAssetContent(assetPath, extInfo)
 		return content, content, nil, err
@@ -19,7 +19,7 @@ func (s *Sprocket) readAsset(assetPath string, extInfo *types.ExtensionInfo) (fu
 	graph := dependencygraph.Graph{}
 	curAssetCache := make(map[string][]byte)
 	dependencyList, err := graph.Walk(assetPath, func(curPath, parentPath string, g *dependencygraph.Graph) error {
-		curRequires, curContent, curErr := s.readAssetWithDependencies(curPath, parentPath)
+		curRequires, curContent, curErr := s.readAssetWithDependencies(curPath, parentPath, forceRebuild)
 		if curErr != nil {
 			return curErr
 		}
@@ -51,19 +51,21 @@ func (s *Sprocket) readAsset(assetPath string, extInfo *types.ExtensionInfo) (fu
 	return
 }
 
-func (s *Sprocket) readAssetWithDependencies(argAssetPath, parentPath string) (requires []types.RequireInterface, content []byte, err error) {
+func (s *Sprocket) readAssetWithDependencies(argAssetPath, parentPath string, forceRebuild bool) (requires []types.RequireInterface, content []byte, err error) {
 	var cacheKey *assetscache.AssetCacheKey
-	assetPath, extInfo, err := s.resolvePath(argAssetPath, filepath.Dir(parentPath))
+	assetPath, extInfo, err := s.resolvePath(argAssetPath, filepath.Dir(parentPath), forceRebuild)
 	if err != nil {
 		return nil, nil, err
 	}
 	if cacheKey, err = s.assetsCache.GenerateCacheKey(assetPath); err != nil {
 		return nil, nil, errCantFindAsset(assetPath)
 	}
-	var hit bool
-	content, requires, _, _, hit = s.assetsCache.ReadFromCache(cacheKey)
-	if hit {
-		return
+	if forceRebuild == false {
+		var hit bool
+		content, requires, _, _, hit = s.assetsCache.ReadFromCache(cacheKey)
+		if hit {
+			return
+		}
 	}
 	content, err = s.readAssetContent(assetPath, extInfo)
 	if err != nil {

@@ -31,7 +31,7 @@ import (
 )
 
 func main() {
-    s, err := sprockets.NewWithDefault(os.Args[1])
+    s, err := sprockets.NewWithDefault(os.Args[1], "")
     if err != nil {
         fmt.Println(err)
         return
@@ -85,8 +85,16 @@ Enjoy
 * Return the result
 
 
-### func NewWithDefault(assetDir string)
+## func NewWithDefault(assetsPath, publicPath string)
 This function is here to mimic [rails/sprockets directive processor](https://github.com/rails/sprockets/blob/master/README.md#the-directive-processor) and you should read it
+
+## Production Mode
+Setting up a public path when creating a new SprocketGo will be use to return pre bundled assets.
+If the asset is missing from the public path, it will be automatically build and saved in the public path
+
+## Generate Public Assets
+You can use the function ```func (*Sprocket) Generate(assetUrl string) (error)``` to force the generation of an asset from the asset path to the public path.
+BEWARE: if public path is not set an error will be returned
 
 ## WARNING.
 Go-Sprockets is using [go-libsass](http://github.com/wellington/go-libsass) which embeded a C library and thus may take some time to compile.  Use ```go install``` to avoid recompiling it too often.
@@ -101,7 +109,6 @@ Go-Sprockets is using [go-duktape](https://github.com/olebedev/go-duktape) which
 * implement [depend_on](https://github.com/rails/sprockets#the-depend_on-directive)
 * implement [depend_on_asset](https://github.com/rails/sprockets#the-depend_on_asset-directive)
 * implement [stub](https://github.com/rails/sprockets#the-stub-directive)
-* Make the production mode build assets in the public path
 * Write Tests
 * Make the cache faster!
 

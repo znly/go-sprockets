@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	s, err := sprockets.NewWithDefault(os.Args[1])
+	s, err := sprockets.NewWithDefault(os.Args[1], "")
 	if err != nil {
 		fmt.Println(err)
 		return

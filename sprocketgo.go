@@ -8,23 +8,30 @@ import (
 )
 
 // New creates a new Sprocket pipeline
-func New(assetDir string) (s *Sprocket, err error) {
+// if publicPath is an empty string, Asset will be compiled and cached in memory
+// if publicPath is not empty Files will be served from the public path and builded only if necessary
+func New(assetsPath, publicPath string) (s *Sprocket, err error) {
 	s = &Sprocket{}
-	absAssetDir, err := filepath.Abs(assetDir)
+	s.assetsPath, err = filepath.Abs(assetsPath)
 	if err != nil {
 		return nil, err
 	}
-	s.assetPath = absAssetDir
 	s.defaultExtInfo = newExtensionInfo("")
-	s.PushFrontDefaultPath(s.assetPath)
+	s.PushFrontDefaultPath(s.assetsPath)
 	s.extInfos = make(map[string]*types.ExtensionInfo)
 	s.assetsCache = assetscache.New()
+	if len(publicPath) == 0 {
+		return
+	}
+	s.publicPath, err = filepath.Abs(publicPath)
+	if err != nil {
+		return nil, err
+	}
 	return
 }
 
-// GetAsset will return the asset full content (with all its requirement) or an error if an error occured
-func (s *Sprocket) GetAsset(assetPath string) ([]byte, error) {
-	realAssetPath, extInfo, err := s.resolvePath(assetPath, "")
+func (s *Sprocket) getAsset(assetPath string, forceRebuild bool) ([]byte, error) {
+	realAssetPath, extInfo, err := s.resolvePath(assetPath, "", forceRebuild)
 	if err != nil {
 		return nil, err
 	}
@@ -32,11 +39,12 @@ func (s *Sprocket) GetAsset(assetPath string) ([]byte, error) {
 	if cacheKey, err = s.assetsCache.GenerateCacheKey(realAssetPath); err != nil {
 		return nil, err
 	}
-
-	if cachedfullContent, err := s.assetsCache.GetFullCache(cacheKey); cachedfullContent != nil || err != nil {
-		return cachedfullContent, err
+	if forceRebuild == false {
+		if cachedfullContent, err := s.assetsCache.GetFullCache(cacheKey); cachedfullContent != nil || err != nil {
+			return cachedfullContent, err
+		}
 	}
-	fullContent, content, requires, err := s.readAsset(realAssetPath, extInfo)
+	fullContent, content, requires, err := s.readAsset(realAssetPath, extInfo, forceRebuild)
 	if err != nil {
 		return nil, err
 	}
@@ -53,5 +61,16 @@ func (s *Sprocket) GetAsset(assetPath string) ([]byte, error) {
 		}
 	}
 	s.assetsCache.WriteToCache(cacheKey, fullContent, content, requires, extInfo)
+	if forceRebuild == true {
+		return fullContent, s.writeToPublic(assetPath, fullContent)
+	}
+	go func() {
+		s.writeToPublic(assetPath, fullContent)
+	}()
 	return fullContent, nil
+}
+
+// GetAsset will return the asset full content (with all its requirement) or an error if an error occured
+func (s *Sprocket) GetAsset(assetPath string) ([]byte, error) {
+	return s.getAsset(assetPath, false)
 }

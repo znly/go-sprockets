@@ -7,7 +7,7 @@ import (
 
 // Sprocket structure use in sprocketgo
 type Sprocket struct {
-	assetPath      string
+	assetsPath     string
 	extInfos       map[string]*types.ExtensionInfo
 	defaultExtInfo *types.ExtensionInfo
 	publicPath     string

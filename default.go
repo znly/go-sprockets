@@ -10,22 +10,22 @@ import (
 )
 
 //NewWithDefault create a new Sprocket pipeline:
-//- using assetDir as default asset directory
+//- using assetsPath as default asset directory
 //- ".css", ".scss" and ".sass" configuration
 //    - adding filecompiler for sass (to turn it into scss)
 //    - adding bundlecompiler for sass, scss, css
-//    - adding a search path to [assetDir]/stylesheets
+//    - adding a search path to [assetsPath]/stylesheets
 //    - adding require rules
 //- ".js" and ".coffee" configuration
 //    - adding filecompiler for coffee script (to turn file into )
 //    - adding require rules
-//    - adding a search path to [assetDir]/javascripts
+//    - adding a search path to [assetsPath]/javascripts
 //- ".jpg", ".png", ".svg", ".gif", ".bmp", ".tiff", ".tga" configuration
-//    - adding a search path to [assetDir]/images
+//    - adding a search path to [assetsPath]/images
 //- ".eot", ".svg", ".ttf", ".woff" configuration
-//    - adding a search path to [assetDir]/fonts
-func NewWithDefault(assetDir string) (s *Sprocket, err error) {
-	s, err = New(assetDir)
+//    - adding a search path to [assetsPath]/fonts
+func NewWithDefault(assetsPath, publicPath string) (s *Sprocket, err error) {
+	s, err = New(assetsPath, publicPath)
 	if err != nil {
 		return
 	}
@@ -36,7 +36,7 @@ func NewWithDefault(assetDir string) (s *Sprocket, err error) {
 		Require: regexp.MustCompile(`^\s*(?:\*/)?\s*(?:/\*.*?\*/)*\s*(\*\s*=\s*require((?:_directory|_tree)?)\s+(.+))`),
 	})
 	s.SetBundleCompiler(".css", &bundlecompiler.ScssSassCompiler{})
-	s.PushFrontExtensionPath(".css", filepath.Join(s.assetPath, "stylesheets"))
+	s.PushFrontExtensionPath(".css", filepath.Join(s.assetsPath, "stylesheets"))
 
 	s.PushFrontAlterExtension(".scss", ".css")
 	s.PushFrontAlterExtension(".scss", ".sass")
@@ -45,7 +45,7 @@ func NewWithDefault(assetDir string) (s *Sprocket, err error) {
 		Require: regexp.MustCompile(`^\s*(?:\*/)?\s*(?:/\*.*?\*/)*\s*((?:\*|//)\s*=\s*require((?:_directory|_tree)?)\s+(.+))`),
 	})
 	s.SetBundleCompiler(".scss", &bundlecompiler.ScssSassCompiler{})
-	s.PushFrontExtensionPath(".scss", filepath.Join(s.assetPath, "stylesheets"))
+	s.PushFrontExtensionPath(".scss", filepath.Join(s.assetsPath, "stylesheets"))
 
 	s.PushFrontAlterExtension(".sass", ".css")
 	s.PushFrontAlterExtension(".sass", ".scss")
@@ -55,7 +55,7 @@ func NewWithDefault(assetDir string) (s *Sprocket, err error) {
 	})
 	s.SetFileCompiler(".sass", &filecompiler.SassCompiler{})
 	s.SetBundleCompiler(".sass", &bundlecompiler.ScssSassCompiler{})
-	s.PushFrontExtensionPath(".sass", filepath.Join(s.assetPath, "stylesheets"))
+	s.PushFrontExtensionPath(".sass", filepath.Join(s.assetsPath, "stylesheets"))
 
 	s.PushFrontAlterExtension(".coffee", ".js")
 	s.SetFileCompiler(".coffee", filecompiler.NewCoffeeCompiler())
@@ -63,21 +63,21 @@ func NewWithDefault(assetDir string) (s *Sprocket, err error) {
 		Head:    regexp.MustCompile(`(\s*#[^\n]*\n)*`),
 		Require: regexp.MustCompile(`^(\s*#\s*=\s*require((?:_directory|_tree)?)\s+(.+))`),
 	})
-	s.PushFrontExtensionPath(".coffee", filepath.Join(s.assetPath, "javascripts"))
+	s.PushFrontExtensionPath(".coffee", filepath.Join(s.assetsPath, "javascripts"))
 
 	s.PushFrontAlterExtension(".js", ".coffee")
 	s.SetRequirePattern(".js", &types.RequirePattern{
 		Head:    regexp.MustCompile(`(\s*(/\*(.*\s+)*\*/)*([ \t]*//.*\s+)*)*`),
 		Require: regexp.MustCompile(`^\s*(?:\*/)?\s*(?:/\*.*?\*/)*\s*((?:\*|//)\s*=\s*require((?:_directory|_tree)?)\s+(.+))`),
 	})
-	s.PushFrontExtensionPath(".js", filepath.Join(s.assetPath, "javascripts"))
+	s.PushFrontExtensionPath(".js", filepath.Join(s.assetsPath, "javascripts"))
 
 	for _, ext := range []string{".jpg", ".png", ".svg", ".gif", ".bmp", ".tiff", ".tga"} {
-		s.PushFrontExtensionPath(ext, filepath.Join(s.assetPath, "images"))
+		s.PushFrontExtensionPath(ext, filepath.Join(s.assetsPath, "images"))
 	}
 
 	for _, ext := range []string{".eot", ".svg", ".ttf", ".woff"} {
-		s.PushFrontExtensionPath(ext, filepath.Join(s.assetPath, "fonts"))
+		s.PushFrontExtensionPath(ext, filepath.Join(s.assetsPath, "fonts"))
 	}
 	return
 }
