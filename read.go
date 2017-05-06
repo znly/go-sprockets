@@ -58,7 +58,7 @@ func (s *Sprocket) readAssetWithDependencies(argAssetPath, parentPath string, fo
 		return nil, nil, err
 	}
 	if cacheKey, err = s.assetsCache.GenerateCacheKey(assetPath); err != nil {
-		return nil, nil, errCantFindAsset(assetPath)
+		return nil, nil, ErrNotFound
 	}
 	if forceRebuild == false {
 		var hit bool
@@ -114,7 +114,7 @@ func (s *Sprocket) readAssetWithDependencies(argAssetPath, parentPath string, fo
 func (s *Sprocket) readAssetContent(assetPath string, extInfo *types.ExtensionInfo) ([]byte, error) {
 	content, err := ioutil.ReadFile(assetPath)
 	if err != nil {
-		return nil, errCantFindAsset(assetPath)
+		return nil, ErrNotFound
 	}
 	for _, f := range extInfo.ContentTreatment {
 		content, err = f.Process(content, assetPath)

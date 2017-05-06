@@ -42,14 +42,14 @@ func resolvePath(ei *types.ExtensionInfo, assetPath string, baseDir string) (str
 	//TODO: add a security to stay in certain directories (CHROOT LIKE)
 	if strings.HasPrefix(assetPath, ".") {
 		if baseDir == "" {
-			return "", "", errCantFindAsset(assetPath)
+			return "", "", ErrNotFound
 		}
 		assetPath = filepath.Join(baseDir, assetPath)
 	}
 	if strings.HasPrefix(assetPath, "/") {
 		curAssetPath, curExt, ok := resolveExt(ei, assetPath, ext)
 		if !ok {
-			return "", "", errCantFindAsset(assetPath)
+			return "", "", ErrNotFound
 		}
 		assetPath = curAssetPath
 		ext = curExt
@@ -73,7 +73,7 @@ func resolvePath(ei *types.ExtensionInfo, assetPath string, baseDir string) (str
 			}
 		}
 		if !found {
-			return "", "", errCantFindAsset(assetPath)
+			return "", "", ErrNotFound
 		}
 	}
 	if newAssetPath, err := filepath.EvalSymlinks(assetPath); err == nil {
