@@ -111,27 +111,47 @@ func (ctx *compctx) Init(goopts libs.SassOptions) libs.SassOptions {
 	ctx.Imports.Bind(goopts)
 	ctx.Funcs.Bind(goopts)
 	libs.SassOptionSetSourceComments(goopts, ctx.compiler.LineComments())
-	libs.SetIncludePaths(goopts, ctx.IncludePaths)
+	//os.PathListSeparator
+	incs := strings.Join(ctx.IncludePaths, string(os.PathListSeparator))
+	libs.SassOptionSetIncludePath(goopts, incs)
 	libs.SassOptionSetPrecision(goopts, ctx.Precision)
 	libs.SassOptionSetOutputStyle(goopts, ctx.OutputStyle)
 	libs.SassOptionSetSourceComments(goopts, ctx.Comments)
+
 	return goopts
 }
 
-func (ctx *compctx) FileCompile(path string, out io.Writer) error {
+func (ctx *compctx) fileCompile(path string, out io.Writer, mappath, sourceMapRoot string) error {
 	defer ctx.Reset()
 	gofc := libs.SassMakeFileContext(path)
 	goopts := libs.SassFileContextGetOptions(gofc)
 	ctx.Init(goopts)
-	//os.PathListSeparator
-	incs := strings.Join(ctx.IncludePaths, string(os.PathListSeparator))
-	libs.SassOptionSetIncludePath(goopts, incs)
 
-	// libs.SassOptionSetSourceMapContents(goopts, true)
-	if ctx.includeMap {
-		libs.SassOptionSetSourceMapFile(goopts, "boom.map")
+	var fpath string
+	// libSass won't create a source map unless you ask it to
+	// embed one or give it a file path. It won't actually write
+	// to this file, but it will add this filename into the
+	// css output.
+	if len(mappath) > 0 {
+		libs.SassOptionSetSourceMapFile(goopts, mappath)
+
+		// Output path must be set for libSass to build relative
+		// paths between the source map and the source files
+		if f, ok := out.(*os.File); ok {
+			fpath = f.Name()
+		}
+
+		// without this, the sourceMappingURL in the out file
+		// creates strange relative paths
+		libs.SassOptionSetOutputPath(goopts, fpath)
 	}
 
+	// write source map paths relative to this path
+	if len(sourceMapRoot) > 0 {
+		libs.SassOptionSetSourceMapRoot(goopts, sourceMapRoot)
+	}
+
+	// Set options to the sass context
 	libs.SassFileContextSetOptions(gofc, goopts)
 	gocc := libs.SassFileContextGetContext(gofc)
 	ctx.context = gocc
@@ -142,11 +162,25 @@ func (ctx *compctx) FileCompile(path string, out io.Writer) error {
 	defer libs.SassDeleteCompiler(gocompiler)
 
 	goout := libs.SassContextGetOutputString(gocc)
-	io.WriteString(out, goout)
+	if out == nil {
+		return errors.New("out writer required")
+	}
+	_, err := io.WriteString(out, goout)
+	if err != nil {
+		return err
+	}
 	ctx.Status = libs.SassContextGetErrorStatus(gocc)
 	errJSON := libs.SassContextGetErrorJSON(gocc)
+	mapout := libs.SassContextGetSourceMapString(gocc)
+
+	if len(mappath) > 0 && len(mapout) > 0 {
+		err := ioutil.WriteFile(mappath, []byte(mapout), 0666)
+		if err != nil {
+			return err
+		}
+	}
 	// Yet another property for storing errors
-	err := ctx.ProcessSassError([]byte(errJSON))
+	err = ctx.ProcessSassError([]byte(errJSON))
 	if err != nil {
 		return err
 	}
@@ -158,16 +192,34 @@ func (ctx *compctx) FileCompile(path string, out io.Writer) error {
 	return nil
 }
 
-// Compile reads in and writes the libsass compiled result to out.
+// compile reads in and writes the libsass compiled result to out.
 // Options and custom functions are applied as specified in Context.
-func (ctx *compctx) Compile(in io.Reader, out io.Writer) error {
+func (ctx *compctx) compile(out io.Writer, in io.Reader) error {
 
 	defer ctx.Reset()
-	bs, err := ioutil.ReadAll(in)
+	var (
+		bs  []byte
+		err error
+	)
 
-	if err != nil {
-		return err
+	// libSass will fail on Sass syntax given as non-file input
+	// convert the input on its behalf
+	if ctx.compiler.Syntax() == SassSyntax {
+		// this is memory intensive
+		var buf bytes.Buffer
+		err := ToScss(in, &buf)
+		if err != nil {
+			return err
+		}
+		bs = buf.Bytes()
+	} else {
+		// ScssSyntax
+		bs, err = ioutil.ReadAll(in)
+		if err != nil {
+			return err
+		}
 	}
+
 	if len(bs) == 0 {
 		return errors.New("No input provided")
 	}
@@ -177,6 +229,7 @@ func (ctx *compctx) Compile(in io.Reader, out io.Writer) error {
 	libs.SassOptionSetSourceComments(goopts, true)
 
 	ctx.Init(goopts)
+
 	libs.SassDataContextSetOptions(godc, goopts)
 	goctx := libs.SassDataContextGetContext(godc)
 	ctx.context = goctx
@@ -194,7 +247,6 @@ func (ctx *compctx) Compile(in io.Reader, out io.Writer) error {
 	ctx.Status = libs.SassContextGetErrorStatus(goctx)
 	errJSON := libs.SassContextGetErrorJSON(goctx)
 	err = ctx.ProcessSassError([]byte(errJSON))
-
 	if err != nil {
 		return err
 	}

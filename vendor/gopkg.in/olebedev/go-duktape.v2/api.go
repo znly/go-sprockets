@@ -1,54 +1,58 @@
 package duktape
 
 /*
-# include "duktape.h"
+#cgo CFLAGS: -std=c99 -Os -fomit-frame-pointer -fstrict-aliasing
+#include "duktape.h"
+#include "duk_logging.h"
+#include "duk_v1_compat.h"
+#include "duk_print_alert.h"
 static void _duk_eval_string(duk_context *ctx, const char *str) {
-  return duk_eval_string(ctx, str);
+  duk_eval_string(ctx, str);
 }
 static void _duk_compile(duk_context *ctx, duk_uint_t flags) {
-  return duk_compile(ctx, flags);
+  duk_compile(ctx, flags);
 }
 static void _duk_compile_file(duk_context *ctx, duk_uint_t flags, const char *path) {
-  return duk_compile_file(ctx, flags, path);
+  duk_compile_file(ctx, flags, path);
 }
 static void _duk_compile_lstring(duk_context *ctx, duk_uint_t flags, const char *src, duk_size_t len) {
-	return duk_compile_lstring(ctx, flags, src, len);
+	duk_compile_lstring(ctx, flags, src, len);
 }
 static void _duk_compile_lstring_filename(duk_context *ctx, duk_uint_t flags, const char *src, duk_size_t len) {
-	return duk_compile_lstring_filename(ctx, flags, src, len);
+	duk_compile_lstring_filename(ctx, flags, src, len);
 }
 static void _duk_compile_string(duk_context *ctx, duk_uint_t flags, const char *src) {
-	return duk_compile_string(ctx, flags, src);
+	duk_compile_string(ctx, flags, src);
 }
 static void _duk_compile_string_filename(duk_context *ctx, duk_uint_t flags, const char *src) {
-	return duk_compile_string_filename(ctx, flags, src);
+	duk_compile_string_filename(ctx, flags, src);
 }
 static void _duk_dump_context_stderr(duk_context *ctx) {
-	return duk_dump_context_stderr(ctx);
+	duk_dump_context_stderr(ctx);
 }
 static void _duk_dump_context_stdout(duk_context *ctx) {
-	return duk_dump_context_stdout(ctx);
+	duk_dump_context_stdout(ctx);
 }
 static void _duk_eval(duk_context *ctx) {
-	return duk_eval(ctx);
+	duk_eval(ctx);
 }
 static void _duk_eval_file(duk_context *ctx, const char *path) {
-	return duk_eval_file(ctx, path);
+	duk_eval_file(ctx, path);
 }
 static void _duk_eval_file_noresult(duk_context *ctx, const char *path) {
-	return duk_eval_file_noresult(ctx, path);
+	duk_eval_file_noresult(ctx, path);
 }
 static void _duk_eval_lstring(duk_context *ctx, const char *src, duk_size_t len) {
-	return duk_eval_lstring(ctx, src, len);
+	duk_eval_lstring(ctx, src, len);
 }
 static void _duk_eval_lstring_noresult(duk_context *ctx, const char *src, duk_size_t len) {
-	return duk_eval_lstring_noresult(ctx, src, len);
+	duk_eval_lstring_noresult(ctx, src, len);
 }
 static void _duk_eval_noresult(duk_context *ctx) {
-	return duk_eval_noresult(ctx);
+	duk_eval_noresult(ctx);
 }
 static void _duk_eval_string_noresult(duk_context *ctx, const char *src) {
-	return duk_eval_string_noresult(ctx, src);
+	duk_eval_string_noresult(ctx, src);
 }
 static duk_bool_t _duk_is_error(duk_context *ctx, duk_idx_t index) {
 	return duk_is_error(ctx, index);
@@ -108,19 +112,19 @@ static duk_idx_t _duk_push_thread_new_globalenv(duk_context *ctx) {
 	return duk_push_thread_new_globalenv(ctx);
 }
 static void _duk_require_object_coercible(duk_context *ctx, duk_idx_t index) {
-	return duk_require_object_coercible(ctx, index);
+	duk_require_object_coercible(ctx, index);
 }
 static void _duk_require_type_mask(duk_context *ctx, duk_idx_t index, duk_uint_t mask) {
-	return duk_require_type_mask(ctx, index, mask);
+	duk_require_type_mask(ctx, index, mask);
 }
 static const char *_duk_safe_to_string(duk_context *ctx, duk_idx_t index) {
 	return duk_safe_to_string(ctx, index);
 }
 static void _duk_xcopy_top(duk_context *to_ctx, duk_context *from_ctx, duk_idx_t count) {
-	return duk_xcopy_top(to_ctx, from_ctx, count);
+	duk_xcopy_top(to_ctx, from_ctx, count);
 }
 static void _duk_xmove_top(duk_context *to_ctx, duk_context *from_ctx, duk_idx_t count) {
-	return duk_xmove_top(to_ctx, from_ctx, count);
+	duk_xmove_top(to_ctx, from_ctx, count);
 }
 static void *_duk_to_buffer(duk_context *ctx, duk_idx_t index, duk_size_t *out_size) {
 	return duk_to_buffer(ctx, index, out_size);
@@ -166,13 +170,13 @@ import (
 )
 
 // See: http://duktape.org/api.html#duk_alloc
-func (d *Context) Alloc(size int) {
-	C.duk_alloc(d.duk_context, C.duk_size_t(size))
+func (d *Context) Alloc(size int) unsafe.Pointer {
+	return C.duk_alloc(d.duk_context, C.duk_size_t(size))
 }
 
 // See: http://duktape.org/api.html#duk_alloc_raw
-func (d *Context) AllocRaw(size int) {
-	C.duk_alloc_raw(d.duk_context, C.duk_size_t(size))
+func (d *Context) AllocRaw(size int) unsafe.Pointer {
+	return C.duk_alloc_raw(d.duk_context, C.duk_size_t(size))
 }
 
 // See: http://duktape.org/api.html#duk_base64_decode
@@ -236,36 +240,36 @@ func (d *Context) Compile(flags uint) {
 // See: http://duktape.org/api.html#duk_compile_file
 func (d *Context) CompileFile(flags uint, path string) {
 	__path__ := C.CString(path)
-	defer C.free(unsafe.Pointer(__path__))
 	C._duk_compile_file(d.duk_context, C.duk_uint_t(flags), __path__)
+	C.free(unsafe.Pointer(__path__))
 }
 
 // See: http://duktape.org/api.html#duk_compile_lstring
 func (d *Context) CompileLstring(flags uint, src string, len int) {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
 	C._duk_compile_lstring(d.duk_context, C.duk_uint_t(flags), __src__, C.duk_size_t(len))
+	C.free(unsafe.Pointer(__src__))
 }
 
 // See: http://duktape.org/api.html#duk_compile_lstring_filename
 func (d *Context) CompileLstringFilename(flags uint, src string, len int) {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
 	C._duk_compile_lstring_filename(d.duk_context, C.duk_uint_t(flags), __src__, C.duk_size_t(len))
+	C.free(unsafe.Pointer(__src__))
 }
 
 // See: http://duktape.org/api.html#duk_compile_string
 func (d *Context) CompileString(flags uint, src string) {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
 	C._duk_compile_string(d.duk_context, C.duk_uint_t(flags), __src__)
+	C.free(unsafe.Pointer(__src__))
 }
 
 // See: http://duktape.org/api.html#duk_compile_string_filename
 func (d *Context) CompileStringFilename(flags uint, src string) {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
 	C._duk_compile_string_filename(d.duk_context, C.duk_uint_t(flags), __src__)
+	C.free(unsafe.Pointer(__src__))
 }
 
 // See: http://duktape.org/api.html#duk_concat
@@ -291,8 +295,9 @@ func (d *Context) DelPropIndex(objIndex int, arrIndex uint) bool {
 // See: http://duktape.org/api.html#duk_del_prop_string
 func (d *Context) DelPropString(objIndex int, key string) bool {
 	__key__ := C.CString(key)
-	defer C.free(unsafe.Pointer(__key__))
-	return int(C.duk_del_prop_string(d.duk_context, C.duk_idx_t(objIndex), __key__)) == 1
+	result := int(C.duk_del_prop_string(d.duk_context, C.duk_idx_t(objIndex), __key__)) == 1
+	C.free(unsafe.Pointer(__key__))
+	return result
 }
 
 // See: http://duktape.org/api.html#duk_def_prop
@@ -344,17 +349,16 @@ func (d *Context) Equals(index1 int, index2 int) bool {
 // See: http://duktape.org/api.html#duk_error
 func (d *Context) Error(errCode int, str string) {
 	__str__ := C.CString(str)
-	defer C.free(unsafe.Pointer(__str__))
 	C._duk_error(d.duk_context, C.duk_errcode_t(errCode), __str__)
+	C.free(unsafe.Pointer(__str__))
 }
 
 func (d *Context) ErrorRaw(errCode int, filename string, line int, errMsg string) {
 	__filename__ := C.CString(filename)
 	__errMsg__ := C.CString(errMsg)
-	defer C.free(unsafe.Pointer(__filename__))
-	defer C.free(unsafe.Pointer(__errMsg__))
-
 	C._duk_error_raw(d.duk_context, C.duk_errcode_t(errCode), __filename__, C.duk_int_t(line), __errMsg__)
+	C.free(unsafe.Pointer(__filename__))
+	C.free(unsafe.Pointer(__errMsg__))
 }
 
 // Errorf pushes a new Error object to the stack and throws it. This will call
@@ -365,8 +369,8 @@ func (d *Context) ErrorRaw(errCode int, filename string, line int, errMsg string
 func (d *Context) Errorf(errCode int, format string, a ...interface{}) {
 	str := fmt.Sprintf(format, a...)
 	__str__ := C.CString(str)
-	defer C.free(unsafe.Pointer(__str__))
 	C._duk_error(d.duk_context, C.duk_errcode_t(errCode), __str__)
+	C.free(unsafe.Pointer(__str__))
 }
 
 // See: http://duktape.org/api.html#duk_eval
@@ -377,29 +381,29 @@ func (d *Context) Eval() {
 // See: http://duktape.org/api.html#duk_eval_file
 func (d *Context) EvalFile(path string) {
 	__path__ := C.CString(path)
-	defer C.free(unsafe.Pointer(__path__))
 	C._duk_eval_file(d.duk_context, __path__)
+	C.free(unsafe.Pointer(__path__))
 }
 
 // See: http://duktape.org/api.html#duk_eval_file_noresult
 func (d *Context) EvalFileNoresult(path string) {
 	__path__ := C.CString(path)
-	defer C.free(unsafe.Pointer(__path__))
 	C._duk_eval_file_noresult(d.duk_context, __path__)
+	C.free(unsafe.Pointer(__path__))
 }
 
 // See: http://duktape.org/api.html#duk_eval_lstring
 func (d *Context) EvalLstring(src string, len int) {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
 	C._duk_eval_lstring(d.duk_context, __src__, C.duk_size_t(len))
+	C.free(unsafe.Pointer(__src__))
 }
 
 // See: http://duktape.org/api.html#duk_eval_lstring_noresult
 func (d *Context) EvalLstringNoresult(src string, len int) {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
 	C._duk_eval_lstring_noresult(d.duk_context, __src__, C.duk_size_t(len))
+	C.free(unsafe.Pointer(__src__))
 }
 
 // See: http://duktape.org/api.html#duk_eval_noresult
@@ -410,22 +414,22 @@ func (d *Context) EvalNoresult() {
 // See: http://duktape.org/api.html#duk_eval_string
 func (d *Context) EvalString(src string) {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
 	C._duk_eval_string(d.duk_context, __src__)
+	C.free(unsafe.Pointer(__src__))
 }
 
 // See: http://duktape.org/api.html#duk_eval_string_noresult
 func (d *Context) EvalStringNoresult(src string) {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
 	C._duk_eval_string_noresult(d.duk_context, __src__)
+	C.free(unsafe.Pointer(__src__))
 }
 
 // See: http://duktape.org/api.html#duk_fatal
 func (d *Context) Fatal(errCode int, errMsg string) {
 	__errMsg__ := C.CString(errMsg)
 	defer C.free(unsafe.Pointer(__errMsg__))
-	C.duk_fatal(d.duk_context, C.duk_errcode_t(errCode), __errMsg__)
+	C.duk_fatal_raw(d.duk_context, __errMsg__)
 }
 
 // See: http://duktape.org/api.html#duk_gc
@@ -439,8 +443,9 @@ func (d *Context) GetBoolean(index int) bool {
 }
 
 // See: http://duktape.org/api.html#duk_get_buffer
-func (d *Context) GetBuffer(index int, outSize int) {
-	C.duk_get_buffer(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(&outSize)))
+func (d *Context) GetBuffer(index int) (rawPtr unsafe.Pointer, outSize uint) {
+	rawPtr = C.duk_get_buffer(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(&outSize)))
+	return rawPtr, outSize
 }
 
 // See: http://duktape.org/api.html#duk_get_context
@@ -467,8 +472,9 @@ func (d *Context) GetFinalizer(index int) {
 // See: http://duktape.org/api.html#duk_get_global_string
 func (d *Context) GetGlobalString(key string) bool {
 	__key__ := C.CString(key)
-	defer C.free(unsafe.Pointer(__key__))
-	return int(C.duk_get_global_string(d.duk_context, __key__)) == 1
+	result := int(C.duk_get_global_string(d.duk_context, __key__)) == 1
+	C.free(unsafe.Pointer(__key__))
+	return result
 }
 
 // See: http://duktape.org/api.html#duk_get_heapptr
@@ -487,8 +493,8 @@ func (d *Context) GetLength(index int) int {
 }
 
 // See: http://duktape.org/api.html#duk_get_lstring
-func (d *Context) GetLstring(index int, outLen int) string {
-	if s := C.duk_get_lstring(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(&outLen))); s != nil {
+func (d *Context) GetLstring(index int) string {
+	if s := C.duk_get_lstring(d.duk_context, C.duk_idx_t(index), nil); s != nil {
 		return C.GoString(s)
 	}
 	return ""
@@ -522,8 +528,9 @@ func (d *Context) GetPropIndex(objIndex int, arrIndex uint) bool {
 // See: http://duktape.org/api.html#duk_get_prop_string
 func (d *Context) GetPropString(objIndex int, key string) bool {
 	__key__ := C.CString(key)
-	defer C.free(unsafe.Pointer(__key__))
-	return int(C.duk_get_prop_string(d.duk_context, C.duk_idx_t(objIndex), __key__)) == 1
+	result := int(C.duk_get_prop_string(d.duk_context, C.duk_idx_t(objIndex), __key__)) == 1
+	C.free(unsafe.Pointer(__key__))
+	return result
 }
 
 // See: http://duktape.org/api.html#duk_get_prototype
@@ -577,8 +584,9 @@ func (d *Context) HasPropIndex(objIndex int, arrIndex uint) bool {
 // See: http://duktape.org/api.html#duk_has_prop_string
 func (d *Context) HasPropString(objIndex int, key string) bool {
 	__key__ := C.CString(key)
-	defer C.free(unsafe.Pointer(__key__))
-	return int(C.duk_has_prop_string(d.duk_context, C.duk_idx_t(objIndex), __key__)) == 1
+	result := int(C.duk_has_prop_string(d.duk_context, C.duk_idx_t(objIndex), __key__)) == 1
+	C.free(unsafe.Pointer(__key__))
+	return result
 }
 
 // See: http://duktape.org/api.html#duk_hex_decode
@@ -666,7 +674,7 @@ func (d *Context) IsNull(index int) bool {
 
 // See: http://duktape.org/api.html#duk_is_null_or_undefined
 func (d *Context) IsNullOrUndefined(index int) bool {
-	return int(C.duk_is_null_or_undefined(d.duk_context, C.duk_idx_t(index))) == 1
+	return d.IsNull(index) || d.IsUndefined(index)
 }
 
 // See: http://duktape.org/api.html#duk_is_number
@@ -785,45 +793,41 @@ func (d *Context) Pcompile(flags uint) error {
 // See: http://duktape.org/api.html#duk_pcompile_file
 func (d *Context) PcompileFile(flags uint, path string) error {
 	__path__ := C.CString(path)
-	defer C.free(unsafe.Pointer(__path__))
-
 	result := int(C._duk_pcompile_file(d.duk_context, C.duk_uint_t(flags), __path__))
+	C.free(unsafe.Pointer(__path__))
 	return d.castStringToError(result)
 }
 
 // See: http://duktape.org/api.html#duk_pcompile_lstring
 func (d *Context) PcompileLstring(flags uint, src string, len int) error {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
-
 	result := int(C._duk_pcompile_lstring(d.duk_context, C.duk_uint_t(flags), __src__, C.duk_size_t(len)))
+	C.free(unsafe.Pointer(__src__))
 	return d.castStringToError(result)
 }
 
 // See: http://duktape.org/api.html#duk_pcompile_lstring_filename
 func (d *Context) PcompileLstringFilename(flags uint, src string, len int) error {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
-
 	result := int(C._duk_pcompile_lstring_filename(d.duk_context, C.duk_uint_t(flags), __src__, C.duk_size_t(len)))
+	C.free(unsafe.Pointer(__src__))
 	return d.castStringToError(result)
 }
 
 // See: http://duktape.org/api.html#duk_pcompile_string
 func (d *Context) PcompileString(flags uint, src string) error {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
-
 	result := int(C._duk_pcompile_string(d.duk_context, C.duk_uint_t(flags), __src__))
-	return d.castStringToError(result)
+	C.free(unsafe.Pointer(__src__))
+	fmt.Println("result herhehreh", result)
+	return nil //d.castStringToError(result)
 }
 
 // See: http://duktape.org/api.html#duk_pcompile_string_filename
 func (d *Context) PcompileStringFilename(flags uint, src string) error {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
-
 	result := int(C._duk_pcompile_string_filename(d.duk_context, C.duk_uint_t(flags), __src__))
+	C.free(unsafe.Pointer(__src__))
 	return d.castStringToError(result)
 }
 
@@ -836,25 +840,24 @@ func (d *Context) Peval() error {
 // See: http://duktape.org/api.html#duk_peval_file
 func (d *Context) PevalFile(path string) error {
 	__path__ := C.CString(path)
-	defer C.free(unsafe.Pointer(__path__))
-
 	result := int(C._duk_peval_file(d.duk_context, __path__))
+	C.free(unsafe.Pointer(__path__))
 	return d.castStringToError(result)
 }
 
 // See: http://duktape.org/api.html#duk_peval_file_noresult
 func (d *Context) PevalFileNoresult(path string) int {
 	__path__ := C.CString(path)
-	defer C.free(unsafe.Pointer(__path__))
-	return int(C._duk_peval_file_noresult(d.duk_context, __path__))
+	result := int(C._duk_peval_file_noresult(d.duk_context, __path__))
+	C.free(unsafe.Pointer(__path__))
+	return result
 }
 
 // See: http://duktape.org/api.html#duk_peval_lstring
 func (d *Context) PevalLstring(src string, len int) error {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
-
 	result := int(C._duk_peval_lstring(d.duk_context, __src__, C.duk_size_t(len)))
+	C.free(unsafe.Pointer(__src__))
 	return d.castStringToError(result)
 
 }
@@ -862,8 +865,9 @@ func (d *Context) PevalLstring(src string, len int) error {
 // See: http://duktape.org/api.html#duk_peval_lstring_noresult
 func (d *Context) PevalLstringNoresult(src string, len int) int {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
-	return int(C._duk_peval_lstring_noresult(d.duk_context, __src__, C.duk_size_t(len)))
+	result := int(C._duk_peval_lstring_noresult(d.duk_context, __src__, C.duk_size_t(len)))
+	C.free(unsafe.Pointer(__src__))
+	return result
 }
 
 // See: http://duktape.org/api.html#duk_peval_noresult
@@ -874,18 +878,17 @@ func (d *Context) PevalNoresult() int {
 // See: http://duktape.org/api.html#duk_peval_string
 func (d *Context) PevalString(src string) error {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
-
 	result := int(C._duk_peval_string(d.duk_context, __src__))
+	C.free(unsafe.Pointer(__src__))
 	return d.castStringToError(result)
 }
 
 // See: http://duktape.org/api.html#duk_peval_string_noresult
 func (d *Context) PevalStringNoresult(src string) int {
 	__src__ := C.CString(src)
-	defer C.free(unsafe.Pointer(__src__))
-
-	return int(C._duk_peval_string_noresult(d.duk_context, __src__))
+	result := int(C._duk_peval_string_noresult(d.duk_context, __src__))
+	C.free(unsafe.Pointer(__src__))
+	return result
 }
 
 func (d *Context) castStringToError(result int) error {
@@ -959,12 +962,12 @@ func (d *Context) PushBoolean(val bool) {
 }
 
 // See: http://duktape.org/api.html#duk_push_buffer
-func (d *Context) PushBuffer(size int, dynamic bool) {
+func (d *Context) PushBuffer(size int, dynamic bool) unsafe.Pointer {
 	var __dynamic__ int
 	if dynamic {
 		__dynamic__ = 1
 	}
-	C._duk_push_buffer(d.duk_context, C.duk_size_t(size), C.duk_bool_t(__dynamic__))
+	return C._duk_push_buffer(d.duk_context, C.duk_size_t(size), C.duk_bool_t(__dynamic__))
 }
 
 // See: http://duktape.org/api.html#duk_push_c_function
@@ -988,15 +991,15 @@ func (d *Context) PushCurrentThread() {
 }
 
 // See: http://duktape.org/api.html#duk_push_dynamic_buffer
-func (d *Context) PushDynamicBuffer(size int) {
-	C._duk_push_dynamic_buffer(d.duk_context, C.duk_size_t(size))
+func (d *Context) PushDynamicBuffer(size int) unsafe.Pointer {
+	return C._duk_push_dynamic_buffer(d.duk_context, C.duk_size_t(size))
 }
 
 // See: http://duktape.org/api.html#duk_push_error_object
 func (d *Context) PushErrorObject(errCode int, format string, value interface{}) {
 	__str__ := C.CString(fmt.Sprintf(format, value))
-	defer C.free(unsafe.Pointer(__str__))
 	C._duk_push_error_object(d.duk_context, C.duk_errcode_t(errCode), __str__)
+	C.free(unsafe.Pointer(__str__))
 }
 
 // See: http://duktape.org/api.html#duk_push_false
@@ -1005,8 +1008,8 @@ func (d *Context) PushFalse() {
 }
 
 // See: http://duktape.org/api.html#duk_push_fixed_buffer
-func (d *Context) PushFixedBuffer(size int) {
-	C._duk_push_fixed_buffer(d.duk_context, C.duk_size_t(size))
+func (d *Context) PushFixedBuffer(size int) unsafe.Pointer {
+	return C._duk_push_fixed_buffer(d.duk_context, C.duk_size_t(size))
 }
 
 // See: http://duktape.org/api.html#duk_push_global_object
@@ -1037,11 +1040,12 @@ func (d *Context) PushInt(val int) {
 // See: http://duktape.org/api.html#duk_push_lstring
 func (d *Context) PushLstring(str string, len int) string {
 	__str__ := C.CString(str)
-	defer C.free(unsafe.Pointer(__str__))
+	var result string
 	if s := C.duk_push_lstring(d.duk_context, __str__, C.duk_size_t(len)); s != nil {
-		return C.GoString(s)
+		result = C.GoString(s)
 	}
-	return ""
+	C.free(unsafe.Pointer(__str__))
+	return result
 }
 
 // See: http://duktape.org/api.html#duk_push_nan
@@ -1067,21 +1071,23 @@ func (d *Context) PushObject() int {
 // See: http://duktape.org/api.html#duk_push_string
 func (d *Context) PushString(str string) string {
 	__str__ := C.CString(str)
-	defer C.free(unsafe.Pointer(__str__))
+	var result string
 	if s := C.duk_push_string(d.duk_context, __str__); s != nil {
-		return C.GoString(s)
+		result = C.GoString(s)
 	}
-	return ""
+	C.free(unsafe.Pointer(__str__))
+	return result
 }
 
 // See: http://duktape.org/api.html#duk_push_string_file
 func (d *Context) PushStringFile(path string) string {
 	__path__ := C.CString(path)
-	defer C.free(unsafe.Pointer(__path__))
+	var result string
 	if s := C._duk_push_string_file(d.duk_context, __path__); s != nil {
-		return C.GoString(s)
+		result = C.GoString(s)
 	}
-	return ""
+	C.free(unsafe.Pointer(__path__))
+	return result
 }
 
 // See: http://duktape.org/api.html#duk_push_this
@@ -1122,8 +1128,9 @@ func (d *Context) PushUndefined() {
 // See: http://duktape.org/api.html#duk_put_global_string
 func (d *Context) PutGlobalString(key string) bool {
 	__key__ := C.CString(key)
-	defer C.free(unsafe.Pointer(__key__))
-	return int(C.duk_put_global_string(d.duk_context, __key__)) == 1
+	result := int(C.duk_put_global_string(d.duk_context, __key__)) == 1
+	C.free(unsafe.Pointer(__key__))
+	return result
 }
 
 // See: http://duktape.org/api.html#duk_put_prop
@@ -1139,8 +1146,9 @@ func (d *Context) PutPropIndex(objIndex int, arrIndex uint) bool {
 // See: http://duktape.org/api.html#duk_put_prop_string
 func (d *Context) PutPropString(objIndex int, key string) bool {
 	__key__ := C.CString(key)
-	defer C.free(unsafe.Pointer(__key__))
-	return int(C.duk_put_prop_string(d.duk_context, C.duk_idx_t(objIndex), __key__)) == 1
+	result := int(C.duk_put_prop_string(d.duk_context, C.duk_idx_t(objIndex), __key__)) == 1
+	C.free(unsafe.Pointer(__key__))
+	return result
 }
 
 // See: http://duktape.org/api.html#duk_remove
@@ -1159,13 +1167,26 @@ func (d *Context) RequireBoolean(index int) bool {
 }
 
 // See: http://duktape.org/api.html#duk_require_buffer
-func (d *Context) RequireBuffer(index int, outSize int) {
-	C.duk_require_buffer(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(&outSize)))
+func (d *Context) RequireBuffer(index int) (rawPtr unsafe.Pointer, outSize uint) {
+	rawPtr = C.duk_require_buffer(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(&outSize)))
+	return rawPtr, outSize
+}
+
+// See: http://duktape.org/api.html#duk_require_callable
+func (d *Context) RequireCallable(index int) {
+	// At present, duk_require_callable is a macro that just calls duk_require_function.
+	// cgo does not support such macros we have to call it directly.
+	C.duk_require_function(d.duk_context, C.duk_idx_t(index))
 }
 
 // See: http://duktape.org/api.html#duk_require_context
 func (d *Context) RequireContext(index int) *Context {
 	return contextFromPointer(C.duk_require_context(d.duk_context, C.duk_idx_t(index)))
+}
+
+// See: http://duktape.org/api.html#duk_require_function
+func (d *Context) RequireFunction(index int) {
+	C.duk_require_function(d.duk_context, C.duk_idx_t(index))
 }
 
 // See: http://duktape.org/api.html#duk_require_heapptr
@@ -1179,8 +1200,8 @@ func (d *Context) RequireInt(index int) int {
 }
 
 // See: http://duktape.org/api.html#duk_require_lstring
-func (d *Context) RequireLstring(index int, outLen int) string {
-	if s := C.duk_require_lstring(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(&outLen))); s != nil {
+func (d *Context) RequireLstring(index int) string {
+	if s := C.duk_require_lstring(d.duk_context, C.duk_idx_t(index), nil); s != nil {
 		return C.GoString(s)
 	}
 	return ""
@@ -1207,8 +1228,8 @@ func (d *Context) RequireObjectCoercible(index int) {
 }
 
 // See: http://duktape.org/api.html#duk_require_pointer
-func (d *Context) RequirePointer(index int) {
-	C.duk_require_pointer(d.duk_context, C.duk_idx_t(index))
+func (d *Context) RequirePointer(index int) unsafe.Pointer {
+	return C.duk_require_pointer(d.duk_context, C.duk_idx_t(index))
 }
 
 // See: http://duktape.org/api.html#duk_require_stack
@@ -1255,23 +1276,24 @@ func (d *Context) RequireValidIndex(index int) {
 }
 
 // See: http://duktape.org/api.html#duk_resize_buffer
-func (d *Context) ResizeBuffer(index int, newSize int) {
-	C.duk_resize_buffer(d.duk_context, C.duk_idx_t(index), C.duk_size_t(newSize))
+func (d *Context) ResizeBuffer(index int, newSize int) unsafe.Pointer {
+	return C.duk_resize_buffer(d.duk_context, C.duk_idx_t(index), C.duk_size_t(newSize))
 }
 
 // See: http://duktape.org/api.html#duk_safe_call
-func (d *Context) SafeCall(fn *[0]byte, nargs, nrets int) int {
+func (d *Context) SafeCall(fn, args *[0]byte, nargs, nrets int) int {
 	return int(C.duk_safe_call(
 		d.duk_context,
 		fn,
+		unsafe.Pointer(&args),
 		C.duk_idx_t(nargs),
 		C.duk_idx_t(nrets),
 	))
 }
 
 // See: http://duktape.org/api.html#duk_safe_to_lstring
-func (d *Context) SafeToLstring(index int, outLen int) string {
-	if s := C.duk_safe_to_lstring(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(&outLen))); s != nil {
+func (d *Context) SafeToLstring(index int) string {
+	if s := C.duk_safe_to_lstring(d.duk_context, C.duk_idx_t(index), nil); s != nil {
 		return C.GoString(s)
 	}
 	return ""
@@ -1331,7 +1353,7 @@ func (d *Context) SwapTop(index int) {
 
 // See: http://duktape.org/api.html#duk_throw
 func (d *Context) Throw() {
-	C.duk_throw(d.duk_context)
+	C.duk_throw_raw(d.duk_context)
 }
 
 // See: http://duktape.org/api.html#duk_to_boolean
@@ -1340,8 +1362,9 @@ func (d *Context) ToBoolean(index int) bool {
 }
 
 // See: http://duktape.org/api.html#duk_to_buffer
-func (d *Context) ToBuffer(index int, outSize int) {
-	C._duk_to_buffer(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(&outSize)))
+func (d *Context) ToBuffer(index int) (rawPtr unsafe.Pointer, outSize uint) {
+	rawPtr = C._duk_to_buffer(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(&outSize)))
+	return rawPtr, outSize
 }
 
 // See: http://duktape.org/api.html#duk_to_defaultvalue
@@ -1350,13 +1373,15 @@ func (d *Context) ToDefaultvalue(index int, hint int) {
 }
 
 // See: http://duktape.org/api.html#duk_to_dynamic_buffer
-func (d *Context) ToDynamicBuffer(index int, outSize int) {
-	C._duk_to_dynamic_buffer(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(&outSize)))
+func (d *Context) ToDynamicBuffer(index int) (rawPtr unsafe.Pointer, outSize uint) {
+	rawPtr = C._duk_to_dynamic_buffer(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(&outSize)))
+	return rawPtr, outSize
 }
 
 // See: http://duktape.org/api.html#duk_to_fixed_buffer
-func (d *Context) ToFixedBuffer(index int, outSize int) {
-	C._duk_to_fixed_buffer(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(&outSize)))
+func (d *Context) ToFixedBuffer(index int) (rawPtr unsafe.Pointer, outSize uint) {
+	rawPtr = C._duk_to_fixed_buffer(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(&outSize)))
+	return rawPtr, outSize
 }
 
 // See: http://duktape.org/api.html#duk_to_int
@@ -1370,8 +1395,8 @@ func (d *Context) ToInt32(index int) int32 {
 }
 
 // See: http://duktape.org/api.html#duk_to_lstring
-func (d *Context) ToLstring(index int, outLen int) string {
-	if s := C.duk_to_lstring(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(&outLen))); s != nil {
+func (d *Context) ToLstring(index int) string {
+	if s := C.duk_to_lstring(d.duk_context, C.duk_idx_t(index), nil); s != nil {
 		return C.GoString(s)
 	}
 	return ""
@@ -1393,8 +1418,8 @@ func (d *Context) ToObject(index int) {
 }
 
 // See: http://duktape.org/api.html#duk_to_pointer
-func (d *Context) ToPointer(index int) {
-	C.duk_to_pointer(d.duk_context, C.duk_idx_t(index))
+func (d *Context) ToPointer(index int) unsafe.Pointer {
+	return C.duk_to_pointer(d.duk_context, C.duk_idx_t(index))
 }
 
 // See: http://duktape.org/api.html#duk_to_primitive
@@ -1467,6 +1492,7 @@ func (d *Context) DebuggerAttach(
 		peekFn,
 		readFlushFn,
 		writeFlushFn,
+		nil,
 		detachedFn,
 		uData,
 	)
@@ -1511,15 +1537,15 @@ func (d *Context) LoadFunction() {
 // See: http://duktape.org/api.html#duk_log
 func (d *Context) Log(loglevel int, format string, value interface{}) {
 	__str__ := C.CString(fmt.Sprintf(format, value))
-	defer C.free(unsafe.Pointer(__str__))
 	C._duk_log(d.duk_context, C.duk_int_t(loglevel), __str__)
+	C.free(unsafe.Pointer(__str__))
 }
 
 // See: http://duktape.org/api.html#duk_log_va
 func (d *Context) LogVa(logLevel int, format string, values ...interface{}) {
 	__str__ := C.CString(fmt.Sprintf(format, values...))
-	defer C.free(unsafe.Pointer(__str__))
 	C._duk_log(d.duk_context, C.duk_int_t(logLevel), __str__)
+	C.free(unsafe.Pointer(__str__))
 }
 
 // See: http://duktape.org/api.html#duk_pnew
@@ -1553,8 +1579,8 @@ func (d *Context) PushCLightfunc(fn *[0]byte, nargs, length, magic int) int {
 // See: http://duktape.org/api.html#duk_push_error_object_va
 func (d *Context) PushErrorObjectVa(errCode int, format string, values ...interface{}) {
 	__str__ := C.CString(fmt.Sprintf(format, values...))
-	defer C.free(unsafe.Pointer(__str__))
 	C._duk_push_error_object(d.duk_context, C.duk_errcode_t(errCode), __str__)
+	C.free(unsafe.Pointer(__str__))
 }
 
 // See: http://duktape.org/api.html#duk_push_external_buffer
@@ -1585,6 +1611,4 @@ func (d *Context) PushExternalBuffer() {
  * StealBuffer see: http://duktape.org/api.html#duk_steal_buffer
  * RequireBufferData see: http://duktape.org/api.html#duk_require_buffer_data
  * IsEvalError see: http://duktape.org/api.html#duk_is_eval_error
- * RequireFunction see: http://duktape.org/api.html#duk_require_function
- * RequireCallable see: http://duktape.org/api.html#duk_require_callable
  */

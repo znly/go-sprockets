@@ -1,13 +1,17 @@
 package duktape
 
 /*
+#cgo CFLAGS: -std=c99 -Os -fomit-frame-pointer -fstrict-aliasing
 #cgo linux LDFLAGS: -lm
 #cgo freebsd LDFLAGS: -lm
 
-# include "duktape.h"
+#include "duktape.h"
+#include "duk_logging.h"
+#include "duk_print_alert.h"
+#include "duk_module_duktape.h"
+#include "duk_console.h"
 extern duk_ret_t goFunctionCall(duk_context *ctx);
 extern void goFinalizeCall(duk_context *ctx);
-
 */
 import "C"
 import (
@@ -45,13 +49,57 @@ type context struct {
 // New returns plain initialized duktape context object
 // See: http://duktape.org/api.html#duk_create_heap_default
 func New() *Context {
-	return &Context{
+	d := &Context{
 		&context{
 			duk_context: C.duk_create_heap(nil, nil, nil, nil, nil),
 			fnIndex:     newFunctionIndex(),
 			timerIndex:  &timerIndex{},
 		},
 	}
+
+	ctx := d.duk_context
+	C.duk_logging_init(ctx, 0)
+	C.duk_print_alert_init(ctx, 0)
+	C.duk_module_duktape_init(ctx)
+	C.duk_console_init(ctx, 0)
+
+	return d
+}
+
+// Flags is a set of flags for controlling the behaviour of duktape.
+type Flags struct {
+	Logging    uint
+	PrintAlert uint
+	Console    uint
+}
+
+// FlagConsoleProxyWrapper is a Console flag.
+// Use a proxy wrapper to make undefined methods (console.foo()) no-ops.
+const FlagConsoleProxyWrapper = 1 << 0
+
+// FlagConsoleFlush is a Console flag.
+// Flush output after every call.
+const FlagConsoleFlush = 1 << 1
+
+// NewWithFlags returns plain initialized duktape context object
+// You can control the behaviour of duktape by setting flags.
+// See: http://duktape.org/api.html#duk_create_heap_default
+func NewWithFlags(flags *Flags) *Context {
+	d := &Context{
+		&context{
+			duk_context: C.duk_create_heap(nil, nil, nil, nil, nil),
+			fnIndex:     newFunctionIndex(),
+			timerIndex:  &timerIndex{},
+		},
+	}
+
+	ctx := d.duk_context
+	C.duk_logging_init(ctx, C.duk_uint_t(flags.Logging))
+	C.duk_print_alert_init(ctx, C.duk_uint_t(flags.PrintAlert))
+	C.duk_module_duktape_init(ctx)
+	C.duk_console_init(ctx, C.duk_uint_t(flags.Console))
+
+	return d
 }
 
 func contextFromPointer(ctx *C.duk_context) *Context {

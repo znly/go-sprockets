@@ -4,27 +4,31 @@
 		{
 			"importpath": "github.com/wellington/go-libsass",
 			"repository": "https://github.com/wellington/go-libsass",
-			"revision": "e4e2caac0b909f543121a9d2bfecdc55d88a7d08",
+			"vcs": "git",
+			"revision": "70e55d4c8433334142a94120c8b3fbccd0a0af25",
 			"branch": "master"
 		},
 		{
 			"importpath": "github.com/wellington/spritewell",
 			"repository": "https://github.com/wellington/spritewell",
-			"revision": "4b95dacd03cd9468526a121d6b637b0bad028331",
+			"vcs": "git",
+			"revision": "da08877d33fc78eecf40cf3b40c5f5e296e0acf1",
 			"branch": "master"
 		},
 		{
 			"importpath": "golang.org/x/net/context",
 			"repository": "https://go.googlesource.com/net",
-			"revision": "e7da8edaa52631091740908acaf2c2d4c9b3ce90",
+			"vcs": "git",
+			"revision": "8351a756f30f1297fe94bbf4b767ec589c6ea6d0",
 			"branch": "master",
 			"path": "/context"
 		},
 		{
 			"importpath": "gopkg.in/olebedev/go-duktape.v2",
 			"repository": "https://gopkg.in/olebedev/go-duktape.v2",
-			"revision": "55fa18c4e63070a925cf2090e699d4e6edd80949",
-			"branch": "v2"
+			"vcs": "git",
+			"revision": "956dbdf427ebe572ff25ad9ed9f9c851d3e46126",
+			"branch": "v3"
 		}
 	]
 }
