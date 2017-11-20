@@ -7,7 +7,7 @@ import (
 	"io"
 	"sync"
 
-	duktape "gopkg.in/olebedev/go-duktape.v2"
+	duktape "gopkg.in/olebedev/go-duktape.v3"
 )
 
 // CoffeeCompiler is here to compile a coffeescript file into a js file
