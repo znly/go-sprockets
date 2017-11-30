@@ -33,9 +33,9 @@ func (cc *CoffeeCompiler) Process(content []byte, path string) (ret []byte, err 
 	cc.mutex.Lock()
 	defer cc.mutex.Unlock()
 	ctx := cc.jsvm
-	ctx.PushString("function(content, path){CompileError = ''; try {return CoffeeScript.compile(content, {filename: path});} catch(e) {CompiledError = e.toString(); return e}}")
-	ctx.PushString("function")
-	ctx.Compile(duktape.CompileFunction)
+	ctx.EvalString("(function(content, path){CompileError = ''; try {return CoffeeScript.compile(content, {filename: path});} catch(e) {CompiledError = e.toString(); return e}})")
+	ctx.DumpFunction()
+	ctx.LoadFunction()
 	ctx.PushString(string(content))
 	ctx.PushString(path)
 	ctx.Call(2)
