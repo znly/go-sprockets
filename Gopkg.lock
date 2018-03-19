@@ -5,24 +5,23 @@
   branch = "master"
   name = "github.com/wellington/go-libsass"
   packages = [".","libs"]
-  revision = "70e55d4c8433334142a94120c8b3fbccd0a0af25"
+  revision = "4271b0e669862e59ef55a22935c1fed6b146d183"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context"]
-  revision = "a8b9294777976932365dabb6640cf1468d95c70f"
+  revision = "92b859f39abd2d91a854c9f9c4621b2f5054a92d"
 
 [[projects]]
   branch = "v3"
   name = "gopkg.in/olebedev/go-duktape.v3"
   packages = ["."]
-  revision = "f3467e8d1a3651ad2319e37ad152472632b50e9b"
-  source = "git@github.com:bennyscetbun/go-duktape.git"
+  revision = "abf0ba0be5d5d36b1f9266463cc320b9a5ab224e"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b677b964191c2f5be8477aa26938be760488a7edb977c1f42c20f0defe8e3bf5"
+  inputs-digest = "9e62c304d06e4da4bde3f8585112f6571b654d4d680083c6caf5a7427e4fb2c7"
   solver-name = "gps-cdcl"
   solver-version = 1

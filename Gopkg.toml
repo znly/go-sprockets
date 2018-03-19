@@ -28,4 +28,3 @@
 [[constraint]]
   branch = "v3"
   name = "gopkg.in/olebedev/go-duktape.v3"
-  source = "git@github.com:bennyscetbun/go-duktape.git"
